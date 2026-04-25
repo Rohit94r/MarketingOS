@@ -40,3 +40,16 @@ Open `http://localhost:3000`.
 - Scheduler: planned campaign activity
 - Analytics: visibility and channel performance charts
 - Actions: recommended next steps for the team
+
+## Folder Structure
+
+- `app`: Next.js routing only. Keep route files, layouts, metadata, redirects, and global CSS here.
+- `components/dashboard`: Dashboard screen components used by `/dashboard` routes.
+- `components/landing`: Landing page screen components used by `/`.
+- `components/layout`: Shared page shells and navigation layouts.
+- `components/ui`: Reusable primitive UI such as buttons and cards.
+- `components/animations`: Shared motion helpers.
+- `components/charts`: Shared chart components.
+- `lib`: Shared utilities and data helpers.
+
+Route files in `app` should stay thin. If a page needs real UI, move that UI into the matching feature folder under `components` and import it from the route.
