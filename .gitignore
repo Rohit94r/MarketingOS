@@ -12,3 +12,9 @@ coverage
 !.env.example
 
 /lib/generated/prisma
+
+# Python backend
+backend/.venv/
+backend/marketing_os.db
+__pycache__/
+*.py[cod]

@@ -17,33 +17,7 @@ import {
   XAxis,
   YAxis
 } from "recharts";
-import { average, conversionSeries, reachSeries, visibilitySeries } from "@/lib/utils";
-
-export const growthData = [
-  { month: "Jan", visibility: 64, reach: 38, conversion: 22 },
-  { month: "Feb", visibility: 68, reach: 44, conversion: 26 },
-  { month: "Mar", visibility: 71, reach: 49, conversion: 31 },
-  { month: "Apr", visibility: 78, reach: 58, conversion: 36 },
-  { month: "May", visibility: 82, reach: 62, conversion: 43 },
-  { month: "Jun", visibility: 87, reach: 69, conversion: 47 },
-  { month: "Jul", visibility: 91, reach: 76, conversion: 54 }
-];
-
-export const channelData = [
-  { name: "Search", value: 78 },
-  { name: "Social", value: 64 },
-  { name: "Email", value: 57 },
-  { name: "Video", value: 71 },
-  { name: "PR", value: 46 }
-];
-
-export function averageScore() {
-  return average([
-    average(visibilitySeries),
-    average(reachSeries),
-    average(conversionSeries)
-  ]);
-}
+import type { ChannelPoint, GrowthPoint } from "@/lib/api";
 
 const tooltipStyle = {
   background: "rgba(255,255,255,.94)",
@@ -53,10 +27,10 @@ const tooltipStyle = {
   boxShadow: "0 18px 50px rgba(10,10,10,.12)"
 };
 
-export function LineMetricChart() {
+export function LineMetricChart({ data }: { data: GrowthPoint[] }) {
   return (
     <ResponsiveContainer width="100%" height={230}>
-      <LineChart data={growthData}>
+      <LineChart data={data}>
         <CartesianGrid stroke="rgba(10,10,10,.08)" vertical={false} />
         <XAxis dataKey="month" stroke="rgba(10,10,10,.45)" tickLine={false} axisLine={false} />
         <YAxis stroke="rgba(10,10,10,.35)" tickLine={false} axisLine={false} />
@@ -68,10 +42,10 @@ export function LineMetricChart() {
   );
 }
 
-export function AreaMetricChart() {
+export function AreaMetricChart({ data }: { data: GrowthPoint[] }) {
   return (
     <ResponsiveContainer width="100%" height={260}>
-      <AreaChart data={growthData}>
+      <AreaChart data={data}>
         <defs>
           <linearGradient id="visibility" x1="0" x2="0" y1="0" y2="1">
             <stop offset="0%" stopColor="#3B82F6" stopOpacity={0.55} />
@@ -88,16 +62,16 @@ export function AreaMetricChart() {
   );
 }
 
-export function BarMetricChart() {
+export function BarMetricChart({ data }: { data: ChannelPoint[] }) {
   return (
     <ResponsiveContainer width="100%" height={230}>
-      <BarChart data={channelData}>
+      <BarChart data={data}>
         <CartesianGrid stroke="rgba(10,10,10,.08)" vertical={false} />
         <XAxis dataKey="name" stroke="rgba(10,10,10,.45)" tickLine={false} axisLine={false} />
         <YAxis stroke="rgba(10,10,10,.35)" tickLine={false} axisLine={false} />
         <Tooltip contentStyle={tooltipStyle} />
         <Bar dataKey="value" radius={[10, 10, 0, 0]}>
-          {channelData.map((_, index) => (
+          {data.map((_, index) => (
             <Cell key={index} fill={index % 2 ? "#8B5CF6" : "#3B82F6"} />
           ))}
         </Bar>
@@ -106,7 +80,7 @@ export function BarMetricChart() {
   );
 }
 
-export function CircularProgress({ value = averageScore() }: { value?: number }) {
+export function CircularProgress({ value }: { value: number }) {
   return (
     <ResponsiveContainer width="100%" height={210}>
       <RadialBarChart innerRadius="72%" outerRadius="100%" data={[{ value }]} startAngle={90} endAngle={-270}>

@@ -1,15 +1,28 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { CalendarDays, Clock } from "lucide-react";
 import { Card } from "@/components/ui/card";
-
-const days = Array.from({ length: 35 }, (_, index) => index + 1);
-const posts = [
-  ["Mon 9:00", "Launch teaser for AI visibility score"],
-  ["Tue 13:30", "Competitor tracking carousel"],
-  ["Thu 10:15", "Founder POV newsletter"],
-  ["Fri 16:00", "Demo cutdown for paid social"]
-];
+import { getSchedulerData, type SchedulerData } from "@/lib/api";
 
 export default function SchedulerPage() {
+  const [scheduler, setScheduler] = useState<SchedulerData | null>(null);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    getSchedulerData()
+      .then(setScheduler)
+      .catch(() => setError("Unable to load scheduler. Please start the FastAPI backend."));
+  }, []);
+
+  if (error) {
+    return <Card className="p-5 text-sm text-red-700">{error}</Card>;
+  }
+
+  if (!scheduler) {
+    return <Card className="p-5 text-sm text-black/55">Loading scheduler...</Card>;
+  }
+
   return (
     <div className="space-y-7">
       <div>
@@ -19,14 +32,14 @@ export default function SchedulerPage() {
       <div className="grid gap-5 xl:grid-cols-[1fr_.55fr]">
         <Card className="p-5">
           <div className="mb-5 flex items-center justify-between">
-            <h2 className="flex items-center gap-2 text-lg font-semibold"><CalendarDays size={18} /> April 2026</h2>
-            <span className="text-sm text-black/45">18 scheduled</span>
+            <h2 className="flex items-center gap-2 text-lg font-semibold"><CalendarDays size={18} /> {scheduler.month}</h2>
+            <span className="text-sm text-black/45">{scheduler.scheduled_count} scheduled</span>
           </div>
           <div className="grid grid-cols-7 gap-2">
-            {days.map((day) => (
+            {scheduler.days.map((day) => (
               <div
                 key={day}
-                className={`aspect-square rounded-2xl border border-black/10 p-2 text-sm ${[3, 7, 11, 18, 24, 29].includes(day) ? "bg-blue-500/15 text-blue-800" : "bg-white/65 text-black/55"}`}
+                className={`aspect-square rounded-2xl border border-black/10 p-2 text-sm ${scheduler.scheduled_days.includes(day) ? "bg-blue-500/15 text-blue-800" : "bg-white/65 text-black/55"}`}
               >
                 {day}
               </div>
@@ -36,10 +49,11 @@ export default function SchedulerPage() {
         <Card className="p-5">
           <h2 className="mb-5 text-lg font-semibold">Post list</h2>
           <div className="space-y-3">
-            {posts.map(([time, title]) => (
-              <div key={title} className="rounded-2xl border border-black/10 bg-white/65 p-4">
-                <p className="mb-2 flex items-center gap-2 text-sm text-blue-700"><Clock size={15} /> {time}</p>
-                <p className="text-black/76">{title}</p>
+            {scheduler.posts.map((post) => (
+              <div key={post.id} className="rounded-2xl border border-black/10 bg-white/65 p-4">
+                <p className="mb-2 flex items-center gap-2 text-sm text-blue-700"><Clock size={15} /> {post.time}</p>
+                <p className="text-black/76">{post.title}</p>
+                <p className="mt-1 text-xs text-black/42">{post.platform}</p>
               </div>
             ))}
           </div>

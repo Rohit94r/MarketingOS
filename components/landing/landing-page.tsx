@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
@@ -16,52 +17,20 @@ import {
 } from "lucide-react";
 import { Counter } from "@/components/animations/counter";
 import { Reveal } from "@/components/animations/reveal";
-import { BarMetricChart, CircularProgress, LineMetricChart, averageScore } from "@/components/charts/marketing-charts";
+import { BarMetricChart, CircularProgress, LineMetricChart } from "@/components/charts/marketing-charts";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { average, conversionSeries, reachSeries, visibilitySeries } from "@/lib/utils";
+import { getLandingData, type ActionTask, type LandingData } from "@/lib/api";
 
-const logos = ["NOVA", "KITE", "ORBIT", "ATLAS", "MONO", "FLUX", "PRISM", "VANTA"];
+const featureIcons = [Gauge, PenLine, Radar, Zap];
 
-const featureStories = [
-  {
-    icon: Gauge,
-    title: "AI Visibility Score",
-    text: "Know where your brand is gaining or losing attention across search, social, and competitor conversations.",
-    stat: 91,
-    label: "visibility score"
-  },
-  {
-    icon: PenLine,
-    title: "Content Generator",
-    text: "Create posts, launch emails, briefs, and response angles from one clear marketing context.",
-    stat: 48,
-    label: "assets drafted"
-  },
-  {
-    icon: Radar,
-    title: "Competitor Tracking",
-    text: "Track market moves without opening twenty tabs. Pricing, launches, content shifts, and ad patterns stay visible.",
-    stat: 14,
-    label: "signals found"
-  },
-  {
-    icon: Zap,
-    title: "Auto Actions",
-    text: "Turn every insight into a practical task your team can fix, generate, schedule, or approve.",
-    stat: 32,
-    label: "actions ready"
-  }
-];
-
-const actions = [
-  ["Fix", "Rewrite low-performing product page intro", "Completed"],
-  ["Generate", "Create 6 paid social launch variants", "In Progress"],
-  ["Schedule", "Queue competitor response thread", "In Progress"],
-  ["Fix", "Refresh SEO title cluster", "Completed"]
-];
-
-function ProductConsole() {
+function ProductConsole({
+  dashboard,
+  actions
+}: {
+  dashboard: LandingData["dashboard"];
+  actions: ActionTask[];
+}) {
   return (
     <Card className="p-4 md:p-5">
       <div className="rounded-[1.25rem] border border-black/10 bg-[#111] p-4 text-white shadow-[0_22px_70px_rgba(10,10,10,.22)]">
@@ -74,9 +43,9 @@ function ProductConsole() {
         </div>
         <div className="grid gap-3 md:grid-cols-3">
           {[
-            ["Score", averageScore()],
-            ["Reach", average(reachSeries)],
-            ["Intent", average(conversionSeries)]
+            ["Score", dashboard.average_score],
+            ["Posts", dashboard.total_posts],
+            ["Actions", dashboard.pending_actions]
           ].map(([label, value]) => (
             <div key={label} className="rounded-2xl bg-white/[0.08] p-4">
               <p className="text-3xl font-semibold"><Counter value={Number(value)} /></p>
@@ -90,17 +59,17 @@ function ProductConsole() {
             <Wand2 size={16} className="text-blue-300" />
           </div>
           <div className="space-y-3">
-            {actions.slice(0, 3).map(([type, title, status]) => (
+            {actions.slice(0, 3).map((action) => (
               <motion.div
-                key={title}
+                key={action.id}
                 whileHover={{ x: 4 }}
                 className="flex items-center justify-between gap-3 rounded-xl bg-white/[0.06] px-3 py-3"
               >
                 <div>
-                  <p className="text-sm">{title}</p>
-                  <p className="mt-1 text-xs text-white/40">{status}</p>
+                  <p className="text-sm">{action.title}</p>
+                  <p className="mt-1 text-xs text-white/40">{action.status}</p>
                 </div>
-                <span className="rounded-full bg-white px-3 py-1 text-xs text-black">{type}</span>
+                <span className="rounded-full bg-white px-3 py-1 text-xs text-black">{action.action_button_label}</span>
               </motion.div>
             ))}
           </div>
@@ -142,10 +111,39 @@ function MiniPreview({ index }: { index: number }) {
 }
 
 export default function LandingPage() {
-  const score = averageScore();
-  const reachAverage = average(reachSeries);
-  const conversionAverage = average(conversionSeries);
-  const visibilityAverage = average(visibilitySeries);
+  const [landing, setLanding] = useState<LandingData | null>(null);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    getLandingData()
+      .then(setLanding)
+      .catch(() => setError("Unable to load site data. Please start the FastAPI backend."));
+  }, []);
+
+  if (error) {
+    return (
+      <main className="grid min-h-screen place-items-center px-5 text-black">
+        <Card className="max-w-lg p-6 text-center">
+          <h1 className="text-2xl font-semibold">AI MarketingOS</h1>
+          <p className="mt-3 text-sm text-red-700">{error}</p>
+        </Card>
+      </main>
+    );
+  }
+
+  if (!landing) {
+    return (
+      <main className="grid min-h-screen place-items-center px-5 text-black">
+        <Card className="p-6 text-sm text-black/55">Loading AI MarketingOS...</Card>
+      </main>
+    );
+  }
+
+  const score = landing.analytics.average_score;
+  const latestGrowth = landing.analytics.growth_data.at(-1);
+  const visibilityAverage = latestGrowth?.visibility ?? 0;
+  const reachAverage = latestGrowth?.reach ?? 0;
+  const conversionAverage = latestGrowth?.conversion ?? 0;
 
   return (
     <main className="overflow-hidden text-black">
@@ -175,13 +173,13 @@ export default function LandingPage() {
             <div>
               <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-black/10 bg-white/70 px-4 py-2 text-sm text-black/65">
                 <CircleDot size={15} className="text-blue-600" />
-                Calm AI operations for modern marketing teams
+                {landing.hero.eyebrow}
               </div>
               <h1 className="max-w-4xl text-balance text-6xl font-semibold leading-[0.95] tracking-[-0.04em] md:text-8xl">
-                AI That Runs Your Marketing
+                {landing.hero.title}
               </h1>
               <p className="mt-7 max-w-2xl text-lg leading-8 text-black/62">
-                Plan campaigns, generate content, track competitors, and move from insight to action in one clear workspace.
+                {landing.hero.description}
               </p>
               <div className="mt-9 flex flex-col gap-3 sm:flex-row">
                 <Link href="/dashboard">
@@ -198,14 +196,14 @@ export default function LandingPage() {
             </div>
           </Reveal>
           <Reveal delay={0.12}>
-            <ProductConsole />
+            <ProductConsole dashboard={landing.dashboard} actions={landing.actions} />
           </Reveal>
         </div>
       </section>
 
       <section className="border-y border-black/10 bg-white/35 py-6">
         <div className="no-scrollbar flex gap-4 overflow-hidden">
-          {[...logos, ...logos].map((logo, index) => (
+          {[...landing.logos, ...landing.logos].map((logo, index) => (
             <motion.div
               key={`${logo}-${index}`}
               className="min-w-44 rounded-full border border-black/10 bg-white/65 px-8 py-4 text-center text-sm font-semibold tracking-[0.24em] text-black/35 grayscale"
@@ -226,8 +224,8 @@ export default function LandingPage() {
           </h2>
         </Reveal>
         <div className="mt-16 space-y-16">
-          {featureStories.map((feature, index) => {
-            const Icon = feature.icon;
+          {landing.features.map((feature, index) => {
+            const Icon = featureIcons[index] ?? Gauge;
             return (
               <Reveal key={feature.title}>
                 <div className="grid items-center gap-8 lg:grid-cols-2">
@@ -272,14 +270,14 @@ export default function LandingPage() {
             </div>
             <div className="grid gap-5 lg:grid-cols-[1.25fr_.85fr]">
               <div className="rounded-3xl border border-black/10 bg-white/65 p-4">
-                <LineMetricChart />
+                <LineMetricChart data={landing.analytics.growth_data} />
               </div>
               <div className="grid gap-5">
                 <div className="rounded-3xl border border-black/10 bg-white/65 p-4">
                   <CircularProgress value={score} />
                 </div>
                 <div className="rounded-3xl border border-black/10 bg-white/65 p-4">
-                  <BarMetricChart />
+                  <BarMetricChart data={landing.analytics.channel_data} />
                 </div>
               </div>
             </div>
@@ -299,20 +297,20 @@ export default function LandingPage() {
           <Reveal delay={0.12}>
             <Card className="p-4">
               <div className="space-y-3">
-                {actions.map(([type, title, status]) => (
+                {landing.actions.map((action) => (
                   <motion.div
-                    key={title}
+                    key={action.id}
                     whileHover={{ x: 4 }}
                     className="flex flex-col gap-4 rounded-2xl border border-black/10 bg-white/70 p-4 md:flex-row md:items-center md:justify-between"
                   >
                     <div className="flex items-start gap-3">
-                      <CheckCircle2 className={status === "Completed" ? "text-blue-600" : "text-violet-600"} size={20} />
+                      <CheckCircle2 className={action.status === "completed" ? "text-blue-600" : "text-violet-600"} size={20} />
                       <div>
-                        <p className="font-medium">{title}</p>
-                        <p className="mt-1 text-sm text-black/42">{status}</p>
+                        <p className="font-medium">{action.title}</p>
+                        <p className="mt-1 text-sm text-black/42">{action.status} - {action.lift}</p>
                       </div>
                     </div>
-                    <Button variant={status === "Completed" ? "ghost" : "blue"} size="sm">{type}</Button>
+                    <Button variant={action.status === "completed" ? "ghost" : "blue"} size="sm">{action.action_button_label}</Button>
                   </motion.div>
                 ))}
               </div>
