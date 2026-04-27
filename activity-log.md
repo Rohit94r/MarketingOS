@@ -1,1 +1,2 @@
 ## Day 1: Set up project structure with FastAPI backend and Next.js frontend, configured environment variables, and initialized repository with README.
+## Day 2: Built FastAPI base application, added health check endpoint, configured CORS, and verified backend locally.
