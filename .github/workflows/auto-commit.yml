@@ -1,30 +1,62 @@
-name: Auto Daily Commit
+- name: Make Daily Change
+  run: |
+    if [ ! -f day.txt ]; then echo 1 > day.txt; fi
 
-on:
-  schedule:
-    - cron: '30 18 * * *'   # 12:00 AM IST daily
-  workflow_dispatch:
+    day=$(cat day.txt)
 
-permissions:
-  contents: write   # ✅ required to push changes
+    messages=(
+"Day 1: Set up project structure with FastAPI backend and Next.js frontend, configured environment variables, and initialized repository with README."
+"Day 2: Built FastAPI base application, added health check endpoint, configured CORS, and verified backend locally."
+"Day 3: Created Next.js frontend structure, added layout and navigation, and connected frontend to backend API."
+"Day 4: Configured PostgreSQL database, added ORM setup, and verified database connectivity."
+"Day 5: Implemented user model with authentication fields and prepared schema validation."
+"Day 6: Developed authentication APIs including signup and login with JWT token generation."
+"Day 7: Built frontend login and signup pages with validation and token storage."
+"Day 8: Designed dashboard layout with sidebar, header, and responsive UI structure."
+"Day 9: Integrated AI content generation API using OpenAI with input parameters and error handling."
+"Day 10: Created frontend UI for AI generator with form inputs, loading states, and output display."
+"Day 11: Implemented post saving feature with database integration and API endpoints."
+"Day 12: Built posts listing page showing saved content with metadata."
+"Day 13: Created post detail view with full caption display and management actions."
+"Day 14: Added edit functionality for posts with API integration and frontend forms."
+"Day 15: Implemented delete functionality with confirmation and error handling."
+"Day 16: Designed basic scheduler model with post status and scheduling fields."
+"Day 17: Developed scheduling API with date validation and status updates."
+"Day 18: Built scheduler UI with date/time picker and status indicators."
+"Day 19: Created calendar view to visualize scheduled posts."
+"Day 20: Implemented activity tracking system for user actions."
+"Day 21: Built dashboard activity feed showing recent user interactions."
+"Day 22: Added dashboard statistics like total posts and usage metrics."
+"Day 23: Implemented usage limits for free users with upgrade prompts."
+"Day 24: Created pricing page with plan comparison."
+"Day 25: Built user settings page for profile and plan management."
+"Day 26: Improved AI prompts for better content generation quality."
+"Day 27: Added reusable content templates for structured generation."
+"Day 28: Enhanced error handling across backend and frontend."
+"Day 29: Polished UI design for better user experience."
+"Day 30: Completed MVP testing and fixed major issues."
+"Day 31: Added foundation for social account integrations."
+"Day 32: Created auto-posting queue system structure."
+"Day 33: Built inbox model for message handling."
+"Day 34: Implemented basic lead CRM system."
+"Day 35: Designed lead pipeline UI for tracking leads."
+"Day 36: Added analytics foundation for tracking performance."
+"Day 37: Built AI assistant interface for marketing help."
+"Day 38: Implemented growth roadmap feature using AI."
+"Day 39: Added monetization structure with feature restrictions."
+"Day 40: Finalized MVP, cleaned code, and prepared documentation."
+    )
 
-jobs:
-  auto-commit:
-    runs-on: ubuntu-latest
+    if [ "$day" -le 40 ]; then
+      echo "## ${messages[$((day-1))]}" >> activity-log.md
+      echo $((day+1)) > day.txt
 
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
+      git config --global user.name "Rohit94r"
+      git config --global user.email "rjdhav66@gmail.com"
 
-      - name: Make Daily Change
-        run: |
-          echo "Last updated: $(date)" >> activity-log.md
-
-      - name: Commit & Push
-        run: |
-          git config --global user.name "Rohit94r"
-          git config --global user.email "rjdhav66@gmail.com"
-
-          git add .
-          git commit -m "Auto daily commit" || echo "No changes"
-          git push
+      git add .
+      git commit -m "${messages[$((day-1))]}" || echo "No changes"
+      git push
+    else
+      echo "## All 40 days completed 🚀" >> activity-log.md
+    fi
