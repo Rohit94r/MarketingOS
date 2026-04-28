@@ -72,7 +72,7 @@ jobs:
             echo $((day+1)) > day.txt
 
             git config --global user.name "Rohit94r"
-            git config --global user.email "rjdhav66@gmail.com"
+            git config --global user.email "rjdhav67@gmail.com"
 
             git add .
             git commit -m "${messages[$((day-1))]}" || echo "No changes"
