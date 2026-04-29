@@ -1,3 +1,4 @@
 ## Day 1: Set up project structure with FastAPI backend and Next.js frontend, configured environment variables, and initialized repository with README.
 ## Day 2: Built FastAPI base application, added health check endpoint, configured CORS, and verified backend locally.
 ## Day 3: Created Next.js frontend structure, added layout and navigation, and connected frontend to backend API.
+## Day 4: Configured PostgreSQL database, added ORM setup, and verified database connectivity.
