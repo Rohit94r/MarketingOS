@@ -3,3 +3,4 @@
 ## Day 3: Created Next.js frontend structure, added layout and navigation, and connected frontend to backend API.
 ## Day 4: Configured PostgreSQL database, added ORM setup, and verified database connectivity.
 ## Day 5: Implemented user model with authentication fields and prepared schema validation.
+## Day 6: Developed authentication APIs including signup and login with JWT token generation.
