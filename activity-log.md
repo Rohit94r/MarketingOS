@@ -5,3 +5,4 @@
 ## Day 5: Implemented user model with authentication fields and prepared schema validation.
 ## Day 6: Developed authentication APIs including signup and login with JWT token generation.
 ## Day 7: Built frontend login and signup pages with validation and token storage.
+## Day 8: Designed dashboard layout with sidebar, header, and responsive UI structure.
