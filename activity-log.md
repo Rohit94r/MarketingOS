@@ -9,3 +9,4 @@
 ## Day 9: Integrated AI content generation API using OpenAI with input parameters and error handling.
 Day 10 - Implemented post system - Commit 1
 Day 10 - Implemented post system - Commit 2
+Day 10 - Implemented post system - Commit 3
