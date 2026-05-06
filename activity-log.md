@@ -7,3 +7,4 @@
 ## Day 7: Built frontend login and signup pages with validation and token storage.
 ## Day 8: Designed dashboard layout with sidebar, header, and responsive UI structure.
 ## Day 9: Integrated AI content generation API using OpenAI with input parameters and error handling.
+Day 10 - Implemented post system - Commit 1
